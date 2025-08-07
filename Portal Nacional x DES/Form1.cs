@@ -1,6 +1,7 @@
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.ApplicationServices;
 using Microsoft.VisualBasic.Logging;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,6 +10,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml.Linq;
@@ -17,29 +19,24 @@ namespace Portal_Nacional_x_DES
 {
     public partial class Form1 : Form
     {
+        //GLOBAIS PORTAL NACIONAL
         static string XML_FOLDER = @""; // Pasta onde estão os XMLs
         static string imTomadorGlobal = "";
         static List<string> chaveSubstituida = new List<string>();
+
+        //GLOBAIS SP NFSE 
+        static string CSV_FOLDER = @"";
+
         public Form1()
         {
             InitializeComponent();
+            this.StartPosition = FormStartPosition.CenterScreen;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
         }
         private void button1_Click(object sender, EventArgs e)
-        {
-            ChooseFolder();
-            registros1.Text = "Total: " + listBox1.Items.Count.ToString();
-        }
-
-        private void processButton1_Click(object sender, EventArgs e)
-        {
-            ProcessarPasta(XML_FOLDER);
-        }
-
-        public void ChooseFolder()
         {
             using (var folderBrowserDialog = new FolderBrowserDialog())
             {
@@ -59,6 +56,12 @@ namespace Portal_Nacional_x_DES
                     }
                 }
             }
+            registros1.Text = "Total: " + listBox1.Items.Count.ToString();
+        }
+
+        private void processButton1_Click(object sender, EventArgs e)
+        {
+            ProcessarPasta(XML_FOLDER);
         }
 
         public void ProcessarPasta(string xmlFolder)
@@ -87,13 +90,13 @@ namespace Portal_Nacional_x_DES
                             var (h, r, cnpj, dados) = GerarRegistros(path);
                             if (!registrosH.ContainsKey(cnpj))
                                 registrosH[cnpj] = h;
-                            registrosR.Add(Path.GetFileName(path).Substring(0, Path.GetFileName(path).Length -4), r);
+                            registrosR.Add(Path.GetFileName(path).Substring(0, Path.GetFileName(path).Length - 4), r);
                             listaRelatorio.Add(dados);
-                            foreach(string chave in chaveSubstituida)
+                            foreach (string chave in chaveSubstituida)
                             {
-                                if(chave != "")
+                                if (chave != "")
                                 {
-                                    if(registrosR.Keys.ToList().IndexOf(chave) >= 0)
+                                    if (registrosR.Keys.ToList().IndexOf(chave) >= 0)
                                     {
                                         index.Add(registrosR.Keys.ToList().IndexOf(chave));
                                     }
@@ -113,7 +116,7 @@ namespace Portal_Nacional_x_DES
                         }
                     }
 
-                    foreach(int posicao in index)
+                    foreach (int posicao in index)
                     {
                         listaRelatorio.RemoveAt(posicao);
                     }
@@ -411,24 +414,254 @@ namespace Portal_Nacional_x_DES
             public string? aliquota { get; set; }
         }
 
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click_1(object sender, EventArgs e)
-        {
-
-        }
-
         private void logButton_Click(object sender, EventArgs e)
         {
             Process.Start("explorer.exe", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log"));
+        }
+
+        //SP NFSE
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            using (var openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Title = "Selecione um arquivo .CSV";
+                openFileDialog.Filter = "Arquivos CSV (*.csv)|*.csv";
+                openFileDialog.Multiselect = false;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string caminhoCSV = openFileDialog.FileName;
+                    CSV_FOLDER = caminhoCSV;
+                    textBox2.Text = caminhoCSV;
+                }
+            }
+        }
+
+        private void processButton2_Click(object sender, EventArgs e)
+        {
+            var registrosH = new Dictionary<string, string>();
+            var registrosR = new Dictionary<string, string>();
+            var listaRelatorio = new List<RelatorioSP>();
+            var index = new List<int>();
+
+            if (string.IsNullOrWhiteSpace(CSV_FOLDER) || !File.Exists(CSV_FOLDER))
+            {
+                MessageBox.Show("Selecione um arquivo CSV válido.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (!CSV_FOLDER.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("O arquivo selecionado não é um .csv.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                try
+                {
+                    var registros = GerarRegistrosSp();
+                    foreach(var(h, r, cnpj, dados) in registros)
+                    {
+                        if (!registrosH.ContainsKey(cnpj))
+                            registrosH[cnpj] = h;
+                        registrosR.Add(dados.numeroNota ?? "CHAVE", r);
+                        listaRelatorio.Add(dados);
+                    }
+                    foreach (string chave in chaveSubstituida)
+                    {
+                        //FAZER COM QUE DESCONSIDERE NOTA CANCELADA
+                        if (chave != "")
+                        {
+                            if (registrosR.Keys.ToList().IndexOf(chave) >= 0)
+                            {
+                                index.Add(registrosR.Keys.ToList().IndexOf(chave));
+                            }
+                            if (chave != "" && registrosR.ContainsKey(chave))
+                            {
+                                MessageBox.Show($"Nota {chave} desconsiderada: Nota Substituída",
+                                    "Nota Substituída", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                registrosR.Remove(chave);
+                            }
+
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro ao processar o arquivo: " + ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            
+
+            foreach (int posicao in index)
+            {
+                listaRelatorio.RemoveAt(posicao);
+            }
+
+            string arquivoSaida = Path.Combine(Path.GetDirectoryName(CSV_FOLDER) ?? "", "1 - ARQUIVO PARA IMPORTAÇÃO - DES.txt");
+
+            string pastaLog = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log");
+            Directory.CreateDirectory(pastaLog);
+            string relatorio = Path.Combine(pastaLog, $"relatorio_{DateTime.Now:yyyyMMdd_HHmmss}.txt");
+
+            using (StreamWriter sw = new StreamWriter(relatorio))
+            {
+                sw.WriteLine("- /// RELATÓRIO DE NOTAS PROCESSADAS /// -");
+                sw.WriteLine($"Tomador: {listaRelatorio.FirstOrDefault()?.tomador} | {listaRelatorio.FirstOrDefault()?.cnpjTomador} \n");
+                sw.WriteLine("Número da Nota | Nome do Emitente | Estado | Município | Valor | Base de Cálculo\n");
+                foreach (var item in listaRelatorio)
+                {
+                    sw.WriteLine($"{item.numeroNota} | {item.nomeEmitente} | {item.estado} | {item.municipio} | {item.valor} | {item.baseCalc}");
+                }
+                sw.WriteLine($"\nTotal de Notas Processadas: {listaRelatorio.Count}");
+            }
+            Process.Start(new ProcessStartInfo(relatorio) { UseShellExecute = true });
+            File.WriteAllLines(arquivoSaida, registrosH.Values.Concat(registrosR.Values));
+        }
+
+        public List<(string registroH, string registroR, string cnpjTomador, RelatorioSP dados)> GerarRegistrosSp()
+        {
+            var resultados = new List<(string, string, string, RelatorioSP)>();
+            try
+            {
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                var linhas = File.ReadAllLines(CSV_FOLDER, Encoding.GetEncoding("Windows-1252"));
+                var linhasSemUltima = linhas.Take(linhas.Length - 1).ToArray();
+                foreach (var linha in linhasSemUltima.Skip(1))
+                {
+                    var colunas = linha.Split(';');
+                    //registro h
+                    string dataAtual = DateTime.Now.ToString("dd/MM/yyyyHH:mm:ss");
+                    string cnpjTomador = colunas[34].Replace(".", "").Replace("/", "").Replace("-", "");
+                    string versaoSistema = "VERSÃO301 BUILD152";
+                    string imTomador = textBox3.Text;
+                    string nomeTomador = colunas[37].ToUpper();
+                    //registro r
+
+
+                    string dataEmissão = colunas[2].Substring(0, colunas[2].Length-9).Replace("/", "");
+
+                    string codServ = colunas[28];
+
+                    string situacao = "1";
+
+                    if (codServ == "1015" || codServ == "1023")
+                    {
+                        situacao = "3";
+                    }
+                    else if (codServ == "2496")
+                    {
+                        situacao = "5";
+                    }
+
+                    string numeroNF = colunas[1];
+
+                    string valorServ = colunas[26];
+                    string novaBaseCalc = colunas[26];
+                    if (valorServ == "0,00")
+                    {
+                        novaBaseCalc = "0";
+                        valorServ = colunas[68];
+                        situacao = "2";
+                    }
+                    valorServ = valorServ.Replace(".", "").Replace(",", ".");
+
+                    string opcaoSimples = (colunas[21] != "0") ? "1" : "2";
+
+                    string cnpjEmit = colunas[10].Replace(".", "").Replace("/", "").Replace("-", "");
+
+                    string nomeEmit = colunas[11];
+
+                    string logradouro = colunas[13];
+
+                    string num = colunas[14];
+
+                    string bairro = colunas[16];
+
+                    string cep = colunas[19].Replace("-", "");
+
+                    var camposR = new List<string> {
+                    "R",
+                    dataEmissão,
+                    dataEmissão,
+                    "16",
+                    "0",
+                    "",
+                    situacao,
+                    "5",
+                    "3550308",
+                    "2",
+                    numeroNF,
+                    valorServ,
+                    novaBaseCalc,
+                    "0.00",
+                    opcaoSimples,
+                    "",
+                    cnpjEmit,
+                    "",
+                    nomeEmit,
+                    logradouro,
+                    num,
+                    "",
+                    bairro,
+                    "3550308",
+                    "1058",
+                    cep,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "3550308",
+                    "3550308",
+                    "1058",
+                    "",
+                    "",
+                    ""
+                    };
+
+                string registroR = string.Join("|", camposR);
+                string registroH = $"H|{dataAtual}||{versaoSistema}|{imTomador}|{cnpjTomador}||{nomeTomador}|{nomeTomador}|||0|2|2|2|||2|2|null";
+
+                var nota = new RelatorioSP
+                {
+                    tomador = nomeTomador,
+                    cnpjTomador = cnpjTomador,
+                    numeroNota = numeroNF,
+                    nomeEmitente = nomeEmit,
+                    estado = "São Paulo",
+                    municipio = "3550308",
+                    valor = valorServ,
+                    baseCalc = novaBaseCalc,
+                };
+                    resultados.Add((registroH, registroR, cnpjTomador, nota));
+                }
+
+                return resultados;
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Erro ao processar o arquivo: " + ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                throw new Exception($"Erro ao processar {CSV_FOLDER}: {ex.Message}");
+            }
+            
+        }
+        public class RelatorioSP {
+            public string? tomador { get; set; }
+            public string? cnpjTomador { get; set; }
+            public string? numeroNota { get; set; }
+            public string? nomeEmitente { get; set; }
+            public string? estado { get; set; }
+            public string? municipio { get; set; }
+            public string? valor { get; set; }
+            public string? baseCalc { get; set; }
         }
     }
 

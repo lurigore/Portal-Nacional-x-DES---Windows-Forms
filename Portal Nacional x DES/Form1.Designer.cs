@@ -37,12 +37,24 @@
             processButton1 = new Button();
             showInscrição = new Label();
             logButton = new Button();
+            guias = new TabControl();
+            tabPage1 = new TabPage();
+            processButton2 = new Button();
+            button2 = new Button();
+            textBox2 = new TextBox();
+            tabPage2 = new TabPage();
+            openFileDialog1 = new OpenFileDialog();
+            tomadorSP_IM = new Label();
+            textBox3 = new TextBox();
+            guias.SuspendLayout();
+            tabPage1.SuspendLayout();
+            tabPage2.SuspendLayout();
             SuspendLayout();
             // 
             // textBox1
             // 
             textBox1.BackColor = SystemColors.ButtonHighlight;
-            textBox1.Location = new Point(12, 12);
+            textBox1.Location = new Point(16, 8);
             textBox1.Name = "textBox1";
             textBox1.ReadOnly = true;
             textBox1.Size = new Size(336, 23);
@@ -50,7 +62,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(354, 12);
+            button1.Location = new Point(358, 8);
             button1.Name = "button1";
             button1.Size = new Size(28, 23);
             button1.TabIndex = 2;
@@ -62,24 +74,23 @@
             // 
             listBox1.FormattingEnabled = true;
             listBox1.ItemHeight = 15;
-            listBox1.Location = new Point(5, 52);
+            listBox1.Location = new Point(9, 48);
             listBox1.Name = "listBox1";
             listBox1.Size = new Size(522, 109);
             listBox1.TabIndex = 3;
-            listBox1.SelectedIndexChanged += listBox1_SelectedIndexChanged;
             // 
             // registros1
             // 
             registros1.AutoSize = true;
-            registros1.Location = new Point(5, 164);
+            registros1.Location = new Point(9, 160);
             registros1.Name = "registros1";
-            registros1.Size = new Size(45, 15);
+            registros1.Size = new Size(44, 15);
             registros1.TabIndex = 4;
             registros1.Text = "Total: 0";
             // 
             // processButton1
             // 
-            processButton1.Location = new Point(388, 10);
+            processButton1.Location = new Point(392, 6);
             processButton1.Name = "processButton1";
             processButton1.Size = new Size(139, 36);
             processButton1.TabIndex = 5;
@@ -90,17 +101,16 @@
             // showInscrição
             // 
             showInscrição.AutoSize = true;
-            showInscrição.Location = new Point(318, 164);
+            showInscrição.Location = new Point(322, 160);
             showInscrição.Name = "showInscrição";
             showInscrição.RightToLeft = RightToLeft.No;
             showInscrição.Size = new Size(209, 15);
             showInscrição.TabIndex = 6;
             showInscrição.Text = "Inscrição Municipal: X.XXX.XXX/XXX-X";
-            showInscrição.Click += label1_Click_1;
             // 
             // logButton
             // 
-            logButton.Location = new Point(449, 205);
+            logButton.Location = new Point(453, 201);
             logButton.Name = "logButton";
             logButton.Size = new Size(86, 23);
             logButton.TabIndex = 7;
@@ -108,26 +118,115 @@
             logButton.UseVisualStyleBackColor = true;
             logButton.Click += logButton_Click;
             // 
+            // guias
+            // 
+            guias.Controls.Add(tabPage1);
+            guias.Controls.Add(tabPage2);
+            guias.Location = new Point(2, -1);
+            guias.Name = "guias";
+            guias.SelectedIndex = 0;
+            guias.Size = new Size(584, 266);
+            guias.TabIndex = 8;
+            // 
+            // tabPage1
+            // 
+            tabPage1.Controls.Add(textBox3);
+            tabPage1.Controls.Add(tomadorSP_IM);
+            tabPage1.Controls.Add(processButton2);
+            tabPage1.Controls.Add(button2);
+            tabPage1.Controls.Add(textBox2);
+            tabPage1.Location = new Point(4, 24);
+            tabPage1.Name = "tabPage1";
+            tabPage1.Padding = new Padding(3);
+            tabPage1.Size = new Size(576, 238);
+            tabPage1.TabIndex = 0;
+            tabPage1.Text = "SP NFSE";
+            tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // processButton2
+            // 
+            processButton2.Location = new Point(402, 6);
+            processButton2.Name = "processButton2";
+            processButton2.Size = new Size(139, 36);
+            processButton2.TabIndex = 6;
+            processButton2.Text = "Processar";
+            processButton2.UseVisualStyleBackColor = true;
+            processButton2.Click += processButton2_Click;
+            // 
+            // button2
+            // 
+            button2.Location = new Point(348, 6);
+            button2.Name = "button2";
+            button2.Size = new Size(28, 23);
+            button2.TabIndex = 3;
+            button2.Text = "...";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
+            // 
+            // textBox2
+            // 
+            textBox2.BackColor = SystemColors.ButtonHighlight;
+            textBox2.Location = new Point(6, 6);
+            textBox2.Name = "textBox2";
+            textBox2.ReadOnly = true;
+            textBox2.Size = new Size(336, 23);
+            textBox2.TabIndex = 2;
+            // 
+            // tabPage2
+            // 
+            tabPage2.Controls.Add(logButton);
+            tabPage2.Controls.Add(processButton1);
+            tabPage2.Controls.Add(showInscrição);
+            tabPage2.Controls.Add(textBox1);
+            tabPage2.Controls.Add(button1);
+            tabPage2.Controls.Add(registros1);
+            tabPage2.Controls.Add(listBox1);
+            tabPage2.Location = new Point(4, 24);
+            tabPage2.Name = "tabPage2";
+            tabPage2.Padding = new Padding(3);
+            tabPage2.Size = new Size(576, 238);
+            tabPage2.TabIndex = 1;
+            tabPage2.Text = "Portal Nacional";
+            tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // openFileDialog1
+            // 
+            openFileDialog1.FileName = "openFileDialog1";
+            // 
+            // tomadorSP_IM
+            // 
+            tomadorSP_IM.AutoSize = true;
+            tomadorSP_IM.Location = new Point(6, 50);
+            tomadorSP_IM.Name = "tomadorSP_IM";
+            tomadorSP_IM.Size = new Size(177, 15);
+            tomadorSP_IM.TabIndex = 7;
+            tomadorSP_IM.Text = "Inscrição Municipal do Tomador";
+            // 
+            // textBox3
+            // 
+            textBox3.Location = new Point(9, 68);
+            textBox3.Name = "textBox3";
+            textBox3.Size = new Size(174, 23);
+            textBox3.TabIndex = 8;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(541, 232);
-            Controls.Add(logButton);
-            Controls.Add(showInscrição);
-            Controls.Add(processButton1);
-            Controls.Add(registros1);
-            Controls.Add(listBox1);
-            Controls.Add(button1);
-            Controls.Add(textBox1);
+            ClientSize = new Size(581, 261);
+            Controls.Add(guias);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "Form1";
             Text = "Portal Nacional X DES";
             Load += Form1_Load;
+            guias.ResumeLayout(false);
+            tabPage1.ResumeLayout(false);
+            tabPage1.PerformLayout();
+            tabPage2.ResumeLayout(false);
+            tabPage2.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
@@ -139,5 +238,14 @@
         private Button processButton1;
         private Label showInscrição;
         private Button logButton;
+        private TabControl guias;
+        private TabPage tabPage1;
+        private TabPage tabPage2;
+        private Button processButton2;
+        private Button button2;
+        private TextBox textBox2;
+        private OpenFileDialog openFileDialog1;
+        private Label tomadorSP_IM;
+        private TextBox textBox3;
     }
 }
