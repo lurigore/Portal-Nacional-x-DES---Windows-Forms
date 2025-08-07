@@ -19,6 +19,8 @@ namespace Portal_Nacional_x_DES
 {
     public partial class Form1 : Form
     {
+        static string versaoDES = "VERSÃO301 BUILD152";
+
         //GLOBAIS PORTAL NACIONAL
         static string XML_FOLDER = @""; // Pasta onde estão os XMLs
         static string imTomadorGlobal = "";
@@ -31,6 +33,7 @@ namespace Portal_Nacional_x_DES
         {
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterScreen;
+            versao_DES.Text = $"DES: {versaoDES}";
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -138,8 +141,9 @@ namespace Portal_Nacional_x_DES
                         }
                         sw.WriteLine($"\nTotal de Notas Processadas: {listaRelatorio.Count}");
                     }
-                    Process.Start(new ProcessStartInfo(relatorio) { UseShellExecute = true });
                     File.WriteAllLines(arquivoSaida, registrosH.Values.Concat(registrosR.Values));
+
+                    abrirPastaProcessada(XML_FOLDER, false);
                 }
             }
 
@@ -235,9 +239,8 @@ namespace Portal_Nacional_x_DES
                 string xNomeTomador = toma?.Element(nf + "xNome")?.Value ?? "";
 
                 string dataAtual = DateTime.Now.ToString("dd/MM/yyyyHH:mm:ss");
-                string versaoSistema = "VERSÃO301 BUILD152";
 
-                string registroH = $"H|{dataAtual}||{versaoSistema}|{imTomadorGlobal}|{cnpjTomador}||{xNomeTomador}|{xNomeTomador}|||0|2|2|2|||2|2|null";
+                string registroH = $"H|{dataAtual}||{versaoDES}|{imTomadorGlobal}|{cnpjTomador}||{xNomeTomador}|{xNomeTomador}|||0|2|2|2|||2|2|null";
 
                 // === Registro R ===
                 string dhEmissao = infDPS?.Element(nf + "dhEmi")?.Value ?? "";
@@ -457,8 +460,13 @@ namespace Portal_Nacional_x_DES
             {
                 try
                 {
+                    if (textBox3.Text.Length == 0)
+                        throw new Exception("Por favor, insira a inscrição municipal do tomador.");
+                    else if (textBox3.Text.Length != 11)
+                        throw new Exception("Inscrição Municipal do tomador inválida.");
+
                     var registros = GerarRegistrosSp();
-                    foreach(var(h, r, cnpj, dados) in registros)
+                    foreach (var (h, r, cnpj, dados) in registros)
                     {
                         if (!registrosH.ContainsKey(cnpj))
                             registrosH[cnpj] = h;
@@ -483,38 +491,38 @@ namespace Portal_Nacional_x_DES
 
                         }
                     }
+
+                    foreach (int posicao in index)
+                    {
+                        listaRelatorio.RemoveAt(posicao);
+                    }
+
+                    string arquivoSaida = Path.Combine(Path.GetDirectoryName(CSV_FOLDER) ?? "", "1 - ARQUIVO PARA IMPORTAÇÃO - DES.txt");
+
+                    string pastaLog = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log");
+                    Directory.CreateDirectory(pastaLog);
+                    string relatorio = Path.Combine(pastaLog, $"relatorio_{DateTime.Now:yyyyMMdd_HHmmss}.txt");
+
+                    using (StreamWriter sw = new StreamWriter(relatorio))
+                    {
+                        sw.WriteLine("- /// RELATÓRIO DE NOTAS PROCESSADAS /// -");
+                        sw.WriteLine($"Tomador: {listaRelatorio.FirstOrDefault()?.tomador} | {listaRelatorio.FirstOrDefault()?.cnpjTomador} \n");
+                        sw.WriteLine("Número da Nota | Nome do Emitente | Estado | Município | Valor | Base de Cálculo\n");
+                        foreach (var item in listaRelatorio)
+                        {
+                            sw.WriteLine($"{item.numeroNota} | {item.nomeEmitente} | {item.estado} | {item.municipio} | {item.valor} | {item.baseCalc}");
+                        }
+                        sw.WriteLine($"\nTotal de Notas Processadas: {listaRelatorio.Count}");
+                    }
+                    File.WriteAllLines(arquivoSaida, registrosH.Values.Concat(registrosR.Values));
+
+                    abrirPastaProcessada(CSV_FOLDER, true);
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Erro ao processar o arquivo: " + ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-            
-
-            foreach (int posicao in index)
-            {
-                listaRelatorio.RemoveAt(posicao);
-            }
-
-            string arquivoSaida = Path.Combine(Path.GetDirectoryName(CSV_FOLDER) ?? "", "1 - ARQUIVO PARA IMPORTAÇÃO - DES.txt");
-
-            string pastaLog = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log");
-            Directory.CreateDirectory(pastaLog);
-            string relatorio = Path.Combine(pastaLog, $"relatorio_{DateTime.Now:yyyyMMdd_HHmmss}.txt");
-
-            using (StreamWriter sw = new StreamWriter(relatorio))
-            {
-                sw.WriteLine("- /// RELATÓRIO DE NOTAS PROCESSADAS /// -");
-                sw.WriteLine($"Tomador: {listaRelatorio.FirstOrDefault()?.tomador} | {listaRelatorio.FirstOrDefault()?.cnpjTomador} \n");
-                sw.WriteLine("Número da Nota | Nome do Emitente | Estado | Município | Valor | Base de Cálculo\n");
-                foreach (var item in listaRelatorio)
-                {
-                    sw.WriteLine($"{item.numeroNota} | {item.nomeEmitente} | {item.estado} | {item.municipio} | {item.valor} | {item.baseCalc}");
-                }
-                sw.WriteLine($"\nTotal de Notas Processadas: {listaRelatorio.Count}");
-            }
-            Process.Start(new ProcessStartInfo(relatorio) { UseShellExecute = true });
-            File.WriteAllLines(arquivoSaida, registrosH.Values.Concat(registrosR.Values));
         }
 
         public List<(string registroH, string registroR, string cnpjTomador, RelatorioSP dados)> GerarRegistrosSp()
@@ -531,13 +539,12 @@ namespace Portal_Nacional_x_DES
                     //registro h
                     string dataAtual = DateTime.Now.ToString("dd/MM/yyyyHH:mm:ss");
                     string cnpjTomador = colunas[34].Replace(".", "").Replace("/", "").Replace("-", "");
-                    string versaoSistema = "VERSÃO301 BUILD152";
-                    string imTomador = textBox3.Text;
+                    string imTomador = textBox3.Text.ToUpper();
+
                     string nomeTomador = colunas[37].ToUpper();
+
                     //registro r
-
-
-                    string dataEmissão = colunas[2].Substring(0, colunas[2].Length-9).Replace("/", "");
+                    string dataEmissão = colunas[2].Substring(0, colunas[2].Length - 9).Replace("/", "");
 
                     string codServ = colunas[28];
 
@@ -627,33 +634,36 @@ namespace Portal_Nacional_x_DES
                     ""
                     };
 
-                string registroR = string.Join("|", camposR);
-                string registroH = $"H|{dataAtual}||{versaoSistema}|{imTomador}|{cnpjTomador}||{nomeTomador}|{nomeTomador}|||0|2|2|2|||2|2|null";
+                    string registroR = string.Join("|", camposR);
+                    string registroH = $"H|{dataAtual}||{versaoDES}|{imTomador}|{cnpjTomador}||{nomeTomador}|{nomeTomador}|||0|2|2|2|||2|2|null";
 
-                var nota = new RelatorioSP
-                {
-                    tomador = nomeTomador,
-                    cnpjTomador = cnpjTomador,
-                    numeroNota = numeroNF,
-                    nomeEmitente = nomeEmit,
-                    estado = "São Paulo",
-                    municipio = "3550308",
-                    valor = valorServ,
-                    baseCalc = novaBaseCalc,
-                };
-                    resultados.Add((registroH, registroR, cnpjTomador, nota));
+                    var nota = new RelatorioSP
+                    {
+                        tomador = nomeTomador,
+                        cnpjTomador = cnpjTomador,
+                        numeroNota = numeroNF,
+                        nomeEmitente = nomeEmit,
+                        estado = "São Paulo",
+                        municipio = "3550308",
+                        valor = valorServ,
+                        baseCalc = novaBaseCalc,
+                    };
+                    bool situacaoCancelado = (colunas[22] == "C") ? true : false;
+                    if (!situacaoCancelado)
+                        resultados.Add((registroH, registroR, cnpjTomador, nota));
                 }
 
                 return resultados;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("Erro ao processar o arquivo: " + ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 throw new Exception($"Erro ao processar {CSV_FOLDER}: {ex.Message}");
             }
-            
+
         }
-        public class RelatorioSP {
+        public class RelatorioSP
+        {
             public string? tomador { get; set; }
             public string? cnpjTomador { get; set; }
             public string? numeroNota { get; set; }
@@ -663,7 +673,27 @@ namespace Portal_Nacional_x_DES
             public string? valor { get; set; }
             public string? baseCalc { get; set; }
         }
-    }
 
+        private void abrirPastaProcessada(string path, bool isArquivo)
+        {
+            try
+            {
+                var result = MessageBox.Show("Arquivo gerado com sucesso. Deseja acessar a pasta?", "Sucesso!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                string folder = isArquivo ? Path.GetDirectoryName(path) ?? "" : path;
+                if (!string.IsNullOrWhiteSpace(path) && result == DialogResult.Yes)
+                {
+                    Process.Start("explorer.exe", folder);
+                }
+                else if (string.IsNullOrWhiteSpace(path))
+                {
+                    throw new Exception("Pasta Inválida");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Não foi possível abrir a pasta selecionada: {ex.Message}");
+            }
+        }
+    }
 }
 

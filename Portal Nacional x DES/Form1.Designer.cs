@@ -39,13 +39,15 @@
             logButton = new Button();
             guias = new TabControl();
             tabPage1 = new TabPage();
+            textBox3 = new TextBox();
+            tomadorSP_IM = new Label();
             processButton2 = new Button();
             button2 = new Button();
             textBox2 = new TextBox();
             tabPage2 = new TabPage();
             openFileDialog1 = new OpenFileDialog();
-            tomadorSP_IM = new Label();
-            textBox3 = new TextBox();
+            versao_DES = new Label();
+            versaoSistema = new Label();
             guias.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
@@ -84,7 +86,7 @@
             registros1.AutoSize = true;
             registros1.Location = new Point(9, 160);
             registros1.Name = "registros1";
-            registros1.Size = new Size(44, 15);
+            registros1.Size = new Size(45, 15);
             registros1.TabIndex = 4;
             registros1.Text = "Total: 0";
             // 
@@ -110,7 +112,7 @@
             // 
             // logButton
             // 
-            logButton.Location = new Point(453, 201);
+            logButton.Location = new Point(439, 266);
             logButton.Name = "logButton";
             logButton.Size = new Size(86, 23);
             logButton.TabIndex = 7;
@@ -143,6 +145,22 @@
             tabPage1.Text = "SP NFSE";
             tabPage1.UseVisualStyleBackColor = true;
             // 
+            // textBox3
+            // 
+            textBox3.Location = new Point(9, 66);
+            textBox3.Name = "textBox3";
+            textBox3.Size = new Size(174, 23);
+            textBox3.TabIndex = 8;
+            // 
+            // tomadorSP_IM
+            // 
+            tomadorSP_IM.AutoSize = true;
+            tomadorSP_IM.Location = new Point(6, 48);
+            tomadorSP_IM.Name = "tomadorSP_IM";
+            tomadorSP_IM.Size = new Size(178, 15);
+            tomadorSP_IM.TabIndex = 7;
+            tomadorSP_IM.Text = "Inscrição Municipal do Tomador";
+            // 
             // processButton2
             // 
             processButton2.Location = new Point(402, 6);
@@ -174,7 +192,6 @@
             // 
             // tabPage2
             // 
-            tabPage2.Controls.Add(logButton);
             tabPage2.Controls.Add(processButton1);
             tabPage2.Controls.Add(showInscrição);
             tabPage2.Controls.Add(textBox1);
@@ -193,27 +210,32 @@
             // 
             openFileDialog1.FileName = "openFileDialog1";
             // 
-            // tomadorSP_IM
+            // versao_DES
             // 
-            tomadorSP_IM.AutoSize = true;
-            tomadorSP_IM.Location = new Point(6, 50);
-            tomadorSP_IM.Name = "tomadorSP_IM";
-            tomadorSP_IM.Size = new Size(177, 15);
-            tomadorSP_IM.TabIndex = 7;
-            tomadorSP_IM.Text = "Inscrição Municipal do Tomador";
+            versao_DES.AutoSize = true;
+            versao_DES.Location = new Point(12, 270);
+            versao_DES.Name = "versao_DES";
+            versao_DES.Size = new Size(67, 15);
+            versao_DES.TabIndex = 10;
+            versao_DES.Text = "Versão DES:";
             // 
-            // textBox3
+            // versaoSistema
             // 
-            textBox3.Location = new Point(9, 68);
-            textBox3.Name = "textBox3";
-            textBox3.Size = new Size(174, 23);
-            textBox3.TabIndex = 8;
+            versaoSistema.AutoSize = true;
+            versaoSistema.Location = new Point(531, 270);
+            versaoSistema.Name = "versaoSistema";
+            versaoSistema.Size = new Size(41, 15);
+            versaoSistema.TabIndex = 11;
+            versaoSistema.Text = "V.0.1.2";
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(581, 261);
+            ClientSize = new Size(581, 294);
+            Controls.Add(logButton);
+            Controls.Add(versaoSistema);
+            Controls.Add(versao_DES);
             Controls.Add(guias);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -227,6 +249,7 @@
             tabPage2.ResumeLayout(false);
             tabPage2.PerformLayout();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -247,5 +270,7 @@
         private OpenFileDialog openFileDialog1;
         private Label tomadorSP_IM;
         private TextBox textBox3;
+        private Label versao_DES;
+        private Label versaoSistema;
     }
 }
