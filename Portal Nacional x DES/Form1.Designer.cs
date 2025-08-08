@@ -86,7 +86,7 @@
             registros1.AutoSize = true;
             registros1.Location = new Point(9, 160);
             registros1.Name = "registros1";
-            registros1.Size = new Size(45, 15);
+            registros1.Size = new Size(44, 15);
             registros1.TabIndex = 4;
             registros1.Text = "Total: 0";
             // 
@@ -157,7 +157,7 @@
             tomadorSP_IM.AutoSize = true;
             tomadorSP_IM.Location = new Point(6, 48);
             tomadorSP_IM.Name = "tomadorSP_IM";
-            tomadorSP_IM.Size = new Size(178, 15);
+            tomadorSP_IM.Size = new Size(177, 15);
             tomadorSP_IM.TabIndex = 7;
             tomadorSP_IM.Text = "Inscrição Municipal do Tomador";
             // 
@@ -242,6 +242,7 @@
             MaximizeBox = false;
             Name = "Form1";
             Text = "Portal Nacional X DES";
+            FormClosing += Form1_FormClosing;
             Load += Form1_Load;
             guias.ResumeLayout(false);
             tabPage1.ResumeLayout(false);

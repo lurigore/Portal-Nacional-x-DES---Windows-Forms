@@ -20,6 +20,9 @@ namespace Portal_Nacional_x_DES
     public partial class Form1 : Form
     {
         static string versaoDES = "VERSÃO301 BUILD152";
+        static string pathBancoIMs = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BancoInscricoes.csv");
+
+        Dictionary<string, string> inscricoes = new Dictionary<string, string>();
 
         //GLOBAIS PORTAL NACIONAL
         static string XML_FOLDER = @""; // Pasta onde estão os XMLs
@@ -34,6 +37,7 @@ namespace Portal_Nacional_x_DES
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterScreen;
             versao_DES.Text = $"DES: {versaoDES}";
+            //fazer com que quando inicie, ele pegue todos os registros no .csv e armazene no dictionary inscricoes.
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -383,6 +387,7 @@ namespace Portal_Nacional_x_DES
             };
 
                 string registroR = string.Join("|", camposR);
+                CadastrarIM(xNomeTomador, cnpjTomador, imTomador);
 
                 var nota = new Relatorio
                 {
@@ -637,6 +642,8 @@ namespace Portal_Nacional_x_DES
                     string registroR = string.Join("|", camposR);
                     string registroH = $"H|{dataAtual}||{versaoDES}|{imTomador}|{cnpjTomador}||{nomeTomador}|{nomeTomador}|||0|2|2|2|||2|2|null";
 
+                    CadastrarIM(nomeTomador, cnpjTomador, imTomador);
+
                     var nota = new RelatorioSP
                     {
                         tomador = nomeTomador,
@@ -652,7 +659,6 @@ namespace Portal_Nacional_x_DES
                     if (!situacaoCancelado)
                         resultados.Add((registroH, registroR, cnpjTomador, nota));
                 }
-
                 return resultados;
             }
             catch (Exception ex)
@@ -693,6 +699,27 @@ namespace Portal_Nacional_x_DES
             {
                 throw new Exception($"Não foi possível abrir a pasta selecionada: {ex.Message}");
             }
+        }
+
+        private void CadastrarIM(string nome, string cnpj, string im)
+        {
+            try
+            {
+                if(!inscricoes.ContainsKey(im))
+                {
+                    inscricoes.Add(im, $"{nome};{cnpj};{im}");
+                }
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"ERRO: {ex.Message}");
+            }
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            MessageBox.Show("oi");
+            File.AppendAllLines(pathBancoIMs, inscricoes.Values);
         }
     }
 }
