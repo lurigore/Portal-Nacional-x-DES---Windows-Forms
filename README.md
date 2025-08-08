@@ -13,16 +13,27 @@ NFS que o prestador é de BH e não é optante pelo MEI será lançada como "5 -
 Para os demais casos, será lançado como "28 - NFS-e Nacional".
 
 Campo Situação Especial:
+
 NFS com serviço de Construção Civil (7.02) serão lançadas como "1.3 - Construção Civil";
+
 NFS com serviço de Publicidade e Propaganda (17.06) serão lançadas como "1.5 - Publicidade e Propaganda";
+
 Para os demais casos, a situação especial será "1.1 - Exclusivamente prestação de serviço".
+
 Motivo de não retenção:
+
 NFS sem retenção de ISS em BH e outros municípios serão lançadas como "2.1 - Não retido";
+
 NFS emitidas pela CGC / CGCON serão lançadas como "2.6 - SPL";
+
 NFS emitidas por optante pelo MEI serão lançadas como "2.14 - MEI";
+
 NFS com retenção de ISS para BH serão lançadas como "2.16 - ISSQN Retido".
+
 Local de Incidência / Prestação:
+
 Para lançamento do local de incidência/prestação será sempre considerado o local de incidência destacado na NFS.
+
 
 Observações Importantes:
 O programa somente não processará notas substituídas caso conste na mesma pasta o XML da nota substituta, ao contrário, ela será importada;
