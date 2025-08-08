@@ -39,6 +39,7 @@
             logButton = new Button();
             guias = new TabControl();
             tabPage1 = new TabPage();
+            nomeTomadorText = new Label();
             textBox3 = new TextBox();
             tomadorSP_IM = new Label();
             processButton2 = new Button();
@@ -86,7 +87,7 @@
             registros1.AutoSize = true;
             registros1.Location = new Point(9, 160);
             registros1.Name = "registros1";
-            registros1.Size = new Size(44, 15);
+            registros1.Size = new Size(45, 15);
             registros1.TabIndex = 4;
             registros1.Text = "Total: 0";
             // 
@@ -132,6 +133,7 @@
             // 
             // tabPage1
             // 
+            tabPage1.Controls.Add(nomeTomadorText);
             tabPage1.Controls.Add(textBox3);
             tabPage1.Controls.Add(tomadorSP_IM);
             tabPage1.Controls.Add(processButton2);
@@ -145,6 +147,15 @@
             tabPage1.Text = "SP NFSE";
             tabPage1.UseVisualStyleBackColor = true;
             // 
+            // nomeTomadorText
+            // 
+            nomeTomadorText.AutoSize = true;
+            nomeTomadorText.Location = new Point(189, 69);
+            nomeTomadorText.Name = "nomeTomadorText";
+            nomeTomadorText.Size = new Size(58, 15);
+            nomeTomadorText.TabIndex = 9;
+            nomeTomadorText.Text = "Empresa: ";
+            // 
             // textBox3
             // 
             textBox3.Location = new Point(9, 66);
@@ -157,7 +168,7 @@
             tomadorSP_IM.AutoSize = true;
             tomadorSP_IM.Location = new Point(6, 48);
             tomadorSP_IM.Name = "tomadorSP_IM";
-            tomadorSP_IM.Size = new Size(177, 15);
+            tomadorSP_IM.Size = new Size(178, 15);
             tomadorSP_IM.TabIndex = 7;
             tomadorSP_IM.Text = "Inscrição Municipal do Tomador";
             // 
@@ -226,7 +237,8 @@
             versaoSistema.Name = "versaoSistema";
             versaoSistema.Size = new Size(41, 15);
             versaoSistema.TabIndex = 11;
-            versaoSistema.Text = "V.0.1.2";
+            versaoSistema.Text = "V.0.1.3";
+            versaoSistema.Click += versaoSistema_Click;
             // 
             // Form1
             // 
@@ -273,5 +285,6 @@
         private TextBox textBox3;
         private Label versao_DES;
         private Label versaoSistema;
+        private Label nomeTomadorText;
     }
 }

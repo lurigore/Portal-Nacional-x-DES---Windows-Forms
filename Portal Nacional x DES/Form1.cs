@@ -37,7 +37,18 @@ namespace Portal_Nacional_x_DES
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterScreen;
             versao_DES.Text = $"DES: {versaoDES}";
-            //fazer com que quando inicie, ele pegue todos os registros no .csv e armazene no dictionary inscricoes.
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            var linhas = File.ReadAllLines(pathBancoIMs, Encoding.GetEncoding("Windows-1252"));
+            foreach (var linha in linhas)
+            {
+                var coluna = linha.Split(";");
+
+                if (!inscricoes.ContainsKey(coluna[2]))
+                {
+                    inscricoes.Add(coluna[2], $"{coluna[0]};{coluna[1]};{coluna[2]}");
+                }
+            }
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -210,7 +221,6 @@ namespace Portal_Nacional_x_DES
 
 
                 string nomeArquivo = Path.GetFileName(xmlPath);
-
                 string imXml = toma?.Element(nf + "IM")?.Value ?? "";
                 if (imTomadorGlobal == "")
                 {
@@ -431,6 +441,8 @@ namespace Portal_Nacional_x_DES
 
         private void button2_Click(object sender, EventArgs e)
         {
+            textBox3.Text = "";
+            nomeTomadorText.Text = "Empresa:";
             using (var openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Title = "Selecione um arquivo .CSV";
@@ -465,10 +477,6 @@ namespace Portal_Nacional_x_DES
             {
                 try
                 {
-                    if (textBox3.Text.Length == 0)
-                        throw new Exception("Por favor, insira a inscrição municipal do tomador.");
-                    else if (textBox3.Text.Length != 11)
-                        throw new Exception("Inscrição Municipal do tomador inválida.");
 
                     var registros = GerarRegistrosSp();
                     foreach (var (h, r, cnpj, dados) in registros)
@@ -544,9 +552,34 @@ namespace Portal_Nacional_x_DES
                     //registro h
                     string dataAtual = DateTime.Now.ToString("dd/MM/yyyyHH:mm:ss");
                     string cnpjTomador = colunas[34].Replace(".", "").Replace("/", "").Replace("-", "");
-                    string imTomador = textBox3.Text.ToUpper();
+                    string imTomadorBanco = "";
 
                     string nomeTomador = colunas[37].ToUpper();
+                    bool imTomadorExiste = inscricoes.Values.Any(l =>
+                    {
+                        var coluna = l.Split(';');
+                        if (coluna[1] == cnpjTomador)
+                        {
+                            imTomadorBanco = coluna[2];
+                            textBox3.Text = coluna[2];
+                            nomeTomadorText.Text = $"Empresa: {coluna[0]} | {coluna[1]}";
+                            return true;
+                        }
+                        return false;
+                    });
+
+
+                    if (textBox3.Text.Length == 0 && !imTomadorExiste)
+                        throw new Exception("Por favor, insira a inscrição municipal do tomador.");
+                    else if (textBox3.Text.Length != 11 && !imTomadorExiste)
+                        throw new Exception("Inscrição Municipal do tomador inválida.");
+
+                    string imTomador = textBox3.Text.ToUpper();
+
+                    if (imTomador != "" && imTomador != imTomadorBanco && imTomadorExiste)
+                    {
+                        throw new Exception("Inscrição Municipal não encontrada");
+                    }
 
                     //registro r
                     string dataEmissão = colunas[2].Substring(0, colunas[2].Length - 9).Replace("/", "");
@@ -663,7 +696,6 @@ namespace Portal_Nacional_x_DES
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Erro ao processar o arquivo: " + ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 throw new Exception($"Erro ao processar {CSV_FOLDER}: {ex.Message}");
             }
 
@@ -705,12 +737,12 @@ namespace Portal_Nacional_x_DES
         {
             try
             {
-                if(!inscricoes.ContainsKey(im))
+                if (!inscricoes.ContainsKey(im))
                 {
                     inscricoes.Add(im, $"{nome};{cnpj};{im}");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception($"ERRO: {ex.Message}");
             }
@@ -718,8 +750,30 @@ namespace Portal_Nacional_x_DES
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            MessageBox.Show("oi");
-            File.AppendAllLines(pathBancoIMs, inscricoes.Values);
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            var linhas = File.ReadAllLines(pathBancoIMs, Encoding.GetEncoding("Windows-1252")).ToList();
+            if (linhas.Count == 0)
+            {
+                File.AppendAllLines(pathBancoIMs, inscricoes.Values);
+                return;
+            }
+            foreach (var im in inscricoes)
+            {
+                bool jaExiste = linhas.Any(l =>
+                {
+                    var coluna = l.Split(';');
+                    return coluna.Length > 2 && coluna[2] == im.Key;
+                });
+                if (!jaExiste)
+                {
+                    File.AppendAllText(pathBancoIMs, im.Value + Environment.NewLine);
+                }
+            }
+        }
+
+        private void versaoSistema_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
