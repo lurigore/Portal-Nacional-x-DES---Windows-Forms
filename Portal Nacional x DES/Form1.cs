@@ -397,7 +397,7 @@ namespace Portal_Nacional_x_DES
             };
 
                 string registroR = string.Join("|", camposR);
-                CadastrarIM(xNomeTomador, cnpjTomador, imTomador);
+                CadastrarIM(xNomeTomador, cnpjTomador, imTomadorGlobal);
 
                 var nota = new Relatorio
                 {
@@ -608,6 +608,7 @@ namespace Portal_Nacional_x_DES
                         situacao = "2";
                     }
                     valorServ = valorServ.Replace(".", "").Replace(",", ".");
+                    novaBaseCalc = novaBaseCalc.Replace(".", "").Replace(",", ".");
 
                     string opcaoSimples = (colunas[21] != "0") ? "1" : "2";
 
