@@ -253,7 +253,7 @@
             versaoSistema.Name = "versaoSistema";
             versaoSistema.Size = new Size(41, 15);
             versaoSistema.TabIndex = 11;
-            versaoSistema.Text = "V.0.1.4";
+            versaoSistema.Text = "V.0.1.5";
             // 
             // manualButton
             // 

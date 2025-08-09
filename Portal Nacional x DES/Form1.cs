@@ -10,6 +10,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -314,6 +315,12 @@ namespace Portal_Nacional_x_DES
                 string ufEmitente = prestEnd?.Element(nf + "UF")?.Value ?? "";
                 string codMunEmitente = prestEnd?.Element(nf + "cMun")?.Value ?? "";
                 string localIncidencia = localIncid?.Value ?? "";
+                string cep = prestEnd?.Element(nf + "CEP")?.Value ?? "";
+
+                if (cep == "")
+                    cep = FaltandoCEP($"{prestEnd?.Element(nf + "xLgr")?.Value ?? ""}, {prestEnd?.Element(nf + "nro")?.Value ?? ""} - {prestEnd?.Element(nf + "xBairro")?.Value ?? ""}");
+
+
 
                 string aliquotaIss = trib?.Element(nf + "pAliq")?.Value ?? "0.00";
                 bool isRetido = aliquotaIss != "0.00";
@@ -379,7 +386,7 @@ namespace Portal_Nacional_x_DES
                 prestEnd?.Element(nf + "xBairro")?.Value ?? "",
                 codMunEmitente,
                 "1058",
-                prestEnd?.Element(nf + "CEP")?.Value ?? "",
+                cep,
                 "",
                 "",
                 "",
@@ -630,6 +637,9 @@ namespace Portal_Nacional_x_DES
 
                     string cep = colunas[19].Replace("-", "");
 
+                    if (cep == "")
+                        cep = FaltandoCEP($"{logradouro}, {num} - {bairro}");
+
                     var camposR = new List<string> {
                     "R",
                     dataEmissão,
@@ -784,11 +794,13 @@ namespace Portal_Nacional_x_DES
 
         string TratarCNPJ(string cnpj) => Convert.ToUInt64(cnpj).ToString(@"00\.000\.000\/0000\-00");
         string TratarIm(string im) => $"{Convert.ToUInt64(im.Substring(0, 10)).ToString(@"0\.000\.000\/000\")}-{im.Substring(10, 1)}";
+        string FaltandoCEP(string endereço) => Interaction.InputBox($"Não consta CEP no XML processado, gentileza inserir manualmente.\nEndereço: {endereço}", "CEP Faltando");
 
         private void manualButton_Click(object sender, EventArgs e)
         {
             Process.Start(new ProcessStartInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Manual de Uso - Conversor XML – DES.pdf")) { UseShellExecute = true });
         }
+
     }
 }
 
