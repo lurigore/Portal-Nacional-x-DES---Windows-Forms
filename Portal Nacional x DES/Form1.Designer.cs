@@ -38,20 +38,22 @@
             showInscrição = new Label();
             logButton = new Button();
             guias = new TabControl();
+            tabPage2 = new TabPage();
             tabPage1 = new TabPage();
+            inscricoesListView = new ListView();
             nomeTomadorText = new Label();
             textBox3 = new TextBox();
             tomadorSP_IM = new Label();
             processButton2 = new Button();
             button2 = new Button();
             textBox2 = new TextBox();
-            tabPage2 = new TabPage();
             openFileDialog1 = new OpenFileDialog();
             versao_DES = new Label();
             versaoSistema = new Label();
+            manualButton = new Button();
             guias.SuspendLayout();
-            tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
+            tabPage1.SuspendLayout();
             SuspendLayout();
             // 
             // textBox1
@@ -87,7 +89,7 @@
             registros1.AutoSize = true;
             registros1.Location = new Point(9, 160);
             registros1.Name = "registros1";
-            registros1.Size = new Size(45, 15);
+            registros1.Size = new Size(44, 15);
             registros1.TabIndex = 4;
             registros1.Text = "Total: 0";
             // 
@@ -123,16 +125,33 @@
             // 
             // guias
             // 
-            guias.Controls.Add(tabPage1);
             guias.Controls.Add(tabPage2);
+            guias.Controls.Add(tabPage1);
             guias.Location = new Point(2, -1);
             guias.Name = "guias";
             guias.SelectedIndex = 0;
             guias.Size = new Size(584, 266);
             guias.TabIndex = 8;
             // 
+            // tabPage2
+            // 
+            tabPage2.Controls.Add(processButton1);
+            tabPage2.Controls.Add(showInscrição);
+            tabPage2.Controls.Add(textBox1);
+            tabPage2.Controls.Add(button1);
+            tabPage2.Controls.Add(registros1);
+            tabPage2.Controls.Add(listBox1);
+            tabPage2.Location = new Point(4, 24);
+            tabPage2.Name = "tabPage2";
+            tabPage2.Padding = new Padding(3);
+            tabPage2.Size = new Size(576, 238);
+            tabPage2.TabIndex = 1;
+            tabPage2.Text = "Portal Nacional & SIEG";
+            tabPage2.UseVisualStyleBackColor = true;
+            // 
             // tabPage1
             // 
+            tabPage1.Controls.Add(inscricoesListView);
             tabPage1.Controls.Add(nomeTomadorText);
             tabPage1.Controls.Add(textBox3);
             tabPage1.Controls.Add(tomadorSP_IM);
@@ -144,8 +163,21 @@
             tabPage1.Padding = new Padding(3);
             tabPage1.Size = new Size(576, 238);
             tabPage1.TabIndex = 0;
-            tabPage1.Text = "SP NFSE";
+            tabPage1.Text = "São Paulo NFS-e";
             tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // inscricoesListView
+            // 
+            inscricoesListView.FullRowSelect = true;
+            inscricoesListView.GridLines = true;
+            inscricoesListView.HeaderStyle = ColumnHeaderStyle.Nonclickable;
+            inscricoesListView.Location = new Point(9, 95);
+            inscricoesListView.MultiSelect = false;
+            inscricoesListView.Name = "inscricoesListView";
+            inscricoesListView.Size = new Size(554, 137);
+            inscricoesListView.TabIndex = 10;
+            inscricoesListView.UseCompatibleStateImageBehavior = false;
+            inscricoesListView.View = View.Details;
             // 
             // nomeTomadorText
             // 
@@ -168,7 +200,7 @@
             tomadorSP_IM.AutoSize = true;
             tomadorSP_IM.Location = new Point(6, 48);
             tomadorSP_IM.Name = "tomadorSP_IM";
-            tomadorSP_IM.Size = new Size(178, 15);
+            tomadorSP_IM.Size = new Size(177, 15);
             tomadorSP_IM.TabIndex = 7;
             tomadorSP_IM.Text = "Inscrição Municipal do Tomador";
             // 
@@ -201,22 +233,6 @@
             textBox2.Size = new Size(336, 23);
             textBox2.TabIndex = 2;
             // 
-            // tabPage2
-            // 
-            tabPage2.Controls.Add(processButton1);
-            tabPage2.Controls.Add(showInscrição);
-            tabPage2.Controls.Add(textBox1);
-            tabPage2.Controls.Add(button1);
-            tabPage2.Controls.Add(registros1);
-            tabPage2.Controls.Add(listBox1);
-            tabPage2.Location = new Point(4, 24);
-            tabPage2.Name = "tabPage2";
-            tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(576, 238);
-            tabPage2.TabIndex = 1;
-            tabPage2.Text = "Portal Nacional";
-            tabPage2.UseVisualStyleBackColor = true;
-            // 
             // openFileDialog1
             // 
             openFileDialog1.FileName = "openFileDialog1";
@@ -237,14 +253,24 @@
             versaoSistema.Name = "versaoSistema";
             versaoSistema.Size = new Size(41, 15);
             versaoSistema.TabIndex = 11;
-            versaoSistema.Text = "V.0.1.3";
-            versaoSistema.Click += versaoSistema_Click;
+            versaoSistema.Text = "V.0.1.4";
+            // 
+            // manualButton
+            // 
+            manualButton.Location = new Point(334, 266);
+            manualButton.Name = "manualButton";
+            manualButton.Size = new Size(99, 23);
+            manualButton.TabIndex = 12;
+            manualButton.Text = "Manual de Uso";
+            manualButton.UseVisualStyleBackColor = true;
+            manualButton.Click += manualButton_Click;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(581, 294);
+            Controls.Add(manualButton);
             Controls.Add(logButton);
             Controls.Add(versaoSistema);
             Controls.Add(versao_DES);
@@ -253,14 +279,13 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "Form1";
-            Text = "Portal Nacional X DES";
+            Text = "Conversor XML - DES";
             FormClosing += Form1_FormClosing;
-            Load += Form1_Load;
             guias.ResumeLayout(false);
-            tabPage1.ResumeLayout(false);
-            tabPage1.PerformLayout();
             tabPage2.ResumeLayout(false);
             tabPage2.PerformLayout();
+            tabPage1.ResumeLayout(false);
+            tabPage1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -286,5 +311,7 @@
         private Label versao_DES;
         private Label versaoSistema;
         private Label nomeTomadorText;
+        private Button manualButton;
+        private ListView inscricoesListView;
     }
 }

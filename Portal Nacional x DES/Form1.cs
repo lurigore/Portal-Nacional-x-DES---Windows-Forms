@@ -35,10 +35,15 @@ namespace Portal_Nacional_x_DES
         public Form1()
         {
             InitializeComponent();
+
             this.StartPosition = FormStartPosition.CenterScreen;
             versao_DES.Text = $"DES: {versaoDES}";
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            var linhas = File.ReadAllLines(pathBancoIMs, Encoding.GetEncoding("Windows-1252"));
+
+            inscricoesListView.Columns.Add("Empresa", 200);
+            inscricoesListView.Columns.Add("CNPJ", 150);
+            inscricoesListView.Columns.Add("Inscricao Municipal", 150);
+
+            var linhas = File.ReadAllLines(pathBancoIMs, Encoding.UTF8);
             foreach (var linha in linhas)
             {
                 var coluna = linha.Split(";");
@@ -46,13 +51,14 @@ namespace Portal_Nacional_x_DES
                 if (!inscricoes.ContainsKey(coluna[2]))
                 {
                     inscricoes.Add(coluna[2], $"{coluna[0]};{coluna[1]};{coluna[2]}");
+
+                    var item = new ListViewItem(coluna[0]);
+                    item.SubItems.Add(TratarCNPJ(coluna[1]));
+                    item.SubItems.Add(TratarIm(coluna[2]));
+                    inscricoesListView.Items.Add(item);
                 }
             }
 
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
         }
         private void button1_Click(object sender, EventArgs e)
         {
@@ -741,6 +747,11 @@ namespace Portal_Nacional_x_DES
                 if (!inscricoes.ContainsKey(im))
                 {
                     inscricoes.Add(im, $"{nome};{cnpj};{im}");
+
+                    var item = new ListViewItem(nome);
+                    item.SubItems.Add(TratarCNPJ(cnpj));
+                    item.SubItems.Add(TratarIm(im));
+                    inscricoesListView.Items.Add(item);
                 }
             }
             catch (Exception ex)
@@ -751,8 +762,7 @@ namespace Portal_Nacional_x_DES
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            var linhas = File.ReadAllLines(pathBancoIMs, Encoding.GetEncoding("Windows-1252")).ToList();
+            var linhas = File.ReadAllLines(pathBancoIMs, Encoding.UTF8).ToList();
             if (linhas.Count == 0)
             {
                 File.AppendAllLines(pathBancoIMs, inscricoes.Values);
@@ -772,9 +782,12 @@ namespace Portal_Nacional_x_DES
             }
         }
 
-        private void versaoSistema_Click(object sender, EventArgs e)
-        {
+        string TratarCNPJ(string cnpj) => Convert.ToUInt64(cnpj).ToString(@"00\.000\.000\/0000\-00");
+        string TratarIm(string im) => $"{Convert.ToUInt64(im.Substring(0, 10)).ToString(@"0\.000\.000\/000\")}-{im.Substring(10, 1)}";
 
+        private void manualButton_Click(object sender, EventArgs e)
+        {
+            Process.Start(new ProcessStartInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Manual de Uso - Conversor XML – DES.pdf")) { UseShellExecute = true });
         }
     }
 }
